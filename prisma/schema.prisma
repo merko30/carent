@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rentals    RentingVehicles[]
+  vehicles Vehicle[] @relation(name:"owner")
+}
+
+model Brand {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  vehicles  Vehicle[]
+}
+
+enum Fuel {
+  GASOLINE
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum CarType {
+  SEDAN
+  COUPE
+  HATCHBACK
+  SUV
+  TRUCK
+  VAN
+  MOTORCYCLE
+  SCOOTER
+  BICYCLE
+}
+
+model VehicleImage {
+  id        Int      @id @default(autoincrement())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId Int
+  url       String
+  isPrimary Boolean
+  sort      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PricePeriod {
+  DAY
+  WEEK
+  MONTH
+}
+
+model Vehicle {
+  id        Int      @id @default(autoincrement())
+  brand     Brand   @relation(fields: [brandId], references: [id])
+  brandId   Int
+  model     String
+  year      Int
+  color     String
+  numberOfDoors Int?
+  numberOfSeats Int?
+  images    VehicleImage[]
+  type CarType @default(SEDAN)
+  typeOfFuel Fuel
+  features Json?
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User     @relation(name:"owner", fields: [ownerId], references: [id])
+  ownerId   Int
+  rentals RentingVehicles[]
+}
+
+model RentingVehicles {
+  id        Int      @id @default(autoincrement())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  startDate DateTime
+  endDate   DateTime?
+  rentDetails Json
+  period    PricePeriod @default(DAY)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
