@@ -1,0 +1,18 @@
+export const COMMON_CAR_COLORS = {
+  CRNA: "#000000",
+  BIJELA: "#FFFFFF",
+  SREBRNA: "#C0C0C0",
+  SIVA: "#808080",
+  PLAVA: "#0000FF",
+  CRVENA: "#FF0000",
+  SMEĐA: "#A52A2A",
+  ZELENA: "#008000",
+  ŽUTA: "#FFFF00",
+  NARANDŽASTA: "#FFA500",
+  LJUBIČASTA: "#800080",
+  ROZA: "#FFC0CB",
+  ZLATNA: "#FFD700",
+  BEŽ: "#F5F5DC",
+};
+
+export const COLORS = Object.keys(COMMON_CAR_COLORS);
