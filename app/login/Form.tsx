@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import Field from "@/components/Field";
 import Alert from "@/components/Alert";
@@ -18,6 +19,19 @@ export const initialState: LoginResponse = {
 
 const Form = () => {
   const [state, formAction] = useActionState(loginFn, initialState);
+
+  useEffect(() => {
+    const setAuthState = async () => {
+      if (state.success) {
+        await (await import("@/store/auth")).useAuthStore
+          .getState()
+          .checkAuth();
+        redirect("/dashboard");
+      }
+    };
+
+    setAuthState();
+  }, [state.success]);
 
   return (
     <form className="mt-8 space-y-6" action={formAction}>

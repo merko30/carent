@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { create } from "zustand";
 
 interface User {
@@ -14,7 +13,7 @@ interface AuthState {
   loading: boolean;
   checkAuth: () => Promise<void>;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -46,14 +45,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user: null, isAuthenticated: false, loading: false });
     }
   },
-  logout: () => {
+  logout: () =>
     fetch("/api/auth/logout", { method: "POST", credentials: "include" })
       .then(() => {
         set({ user: null, isAuthenticated: false });
-        redirect("/login");
       })
       .catch((error) => {
         console.error("Failed to logout:", error);
-      });
-  },
+      }),
 }));

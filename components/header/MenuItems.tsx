@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { useAuthStore } from "@/store/auth";
+import { redirect } from "next/navigation";
 
 interface MenuItemsProps {
   isOpen: boolean;
@@ -9,7 +10,7 @@ interface MenuItemsProps {
 }
 
 const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout: logoutFn } = useAuthStore();
 
   const menuItems = useMemo(
     () => [
@@ -37,6 +38,11 @@ const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
     ],
     [isAuthenticated]
   );
+
+  const logout = async () => {
+    await logoutFn();
+    redirect("/login");
+  };
 
   return (
     <ul

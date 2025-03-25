@@ -13,7 +13,7 @@ const Header = () => {
     <header className="w-full container mx-auto px-4 md:px-0 flex items-center justify-between py-6">
       <Logo />
       <nav>
-        <MenuItems isOpen={isOpen} />
+        <MenuItems isOpen={isOpen} onNavigate={() => setIsOpen(false)} />
         <MobileMenu isOpen={isOpen} onToggle={() => setIsOpen(!isOpen)} />
       </nav>
     </header>

@@ -1,7 +1,6 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { ERRORS } from "@/constants/errors";
@@ -72,7 +71,6 @@ export default async function loginFn(
   });
 
   // navigate
-  redirect("/dashboard");
   return {
     success: true,
     errors: {},
