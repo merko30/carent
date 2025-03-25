@@ -1,12 +1,12 @@
 "use server";
 
+import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+
 import { ERRORS } from "@/constants/errors";
 import { createSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { z } from "zod";
 
 export type LoginResponse = {
   success: boolean;
@@ -66,18 +66,9 @@ export default async function loginFn(
     };
   }
 
-  const token = await createSession({
+  await createSession({
     id: user.id.toString(),
     // roles: user.roles,
-  });
-
-  const cookieStore = await cookies();
-
-  cookieStore.set("session", token, {
-    maxAge: 1000 * 60 * 60 * 24,
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
   });
 
   // navigate

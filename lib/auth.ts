@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
 
 type Payload = {
   userId: string;
@@ -36,15 +37,27 @@ const encrypt = (payload: Payload) => {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(payload.expires)
+    .setExpirationTime("1day")
     .sign(secret);
 };
 
-export const createSession = (user: { id: string }) => {
+export const createSession = async (user: { id: string }) => {
   const payload: Payload = {
-    expires: Date.now() + 1000 * 60 * 60 * 24,
+    expires: Date.now() * 60 * 60 * 24,
     userId: user.id,
   };
 
-  return encrypt(payload);
+  const cookieStore = await cookies();
+
+  const duration = 60 * 60 * 24 * 1000;
+
+  const session = await encrypt(payload);
+  const expires = new Date(Date.now() + duration);
+
+  cookieStore.set("session", session, {
+    maxAge: duration,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    expires,
+  });
 };

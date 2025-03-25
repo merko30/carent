@@ -17,7 +17,7 @@ export const config = {
 const AUTH_PAGES = ["/login", "/register"];
 const PROTECTED_PAGES = ["/dashboard", "/profile"]; // Add pages that require authentication
 
-export async function middleware(req: NextRequest) {
+async function authMiddleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const sessionCookie = (await cookies()).get("session");
 
@@ -36,4 +36,23 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
+}
+
+// async function refreshSessionMiddleware(req: NextRequest) {
+//   const sessionCookie = (await cookies()).get("session");
+
+//   if (sessionCookie?.value) {
+//     const cookieStore = await cookies();
+//     cookieStore.set("session", sessionCookie.value, {
+//       maxAge: 60 * 60 * 24,
+//       secure: process.env.NODE_ENV === "production",
+//       httpOnly: true,
+//     });
+//   }
+
+//   return NextResponse.next();
+// }
+
+export async function middleware(req: NextRequest) {
+  return authMiddleware(req);
 }
