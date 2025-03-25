@@ -15,7 +15,6 @@ export const initialState: LoginResponse = {
   error: null,
   errors: {},
   success: false,
-  user: null,
 };
 
 const Form = () => {

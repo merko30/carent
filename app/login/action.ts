@@ -1,11 +1,15 @@
 "use server";
 
+import { ERRORS } from "@/constants/errors";
+import { createSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 export type LoginResponse = {
   success: boolean;
-  user: any | null;
   errors: Record<string, string>;
   error: { message: string } | null;
 };
@@ -34,33 +38,52 @@ export default async function loginFn(
       },
       {}
     );
-    return { errors, success: false, user: null, error: null };
+    return { errors, success: false, error: null };
   }
 
-  const response = await fetch(`${process.env.SITE_URL}/api/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(rawFormData),
+  const user = await prisma.user.findUnique({
+    where: { email: rawFormData.email?.toString() },
   });
 
-  const json = await response.json();
-
-  if (!response.ok) {
+  if (!user) {
     return {
-      error: { message: json.error.message || "Došlo je do greške" },
+      error: { message: ERRORS.INVALID_CREDENTIALS.message },
       success: false,
-      user: null,
       errors: {},
     };
   }
+
+  const passwordMatch = await bcrypt.compare(
+    rawFormData.password!.toString(),
+    user.password
+  );
+
+  if (!passwordMatch) {
+    return {
+      error: { message: ERRORS.INVALID_CREDENTIALS.message },
+      success: false,
+      errors: {},
+    };
+  }
+
+  const token = await createSession({
+    id: user.id.toString(),
+    // roles: user.roles,
+  });
+
+  const cookieStore = await cookies();
+
+  cookieStore.set("session", token, {
+    maxAge: 1000 * 60 * 60 * 24,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+  });
 
   // navigate
   redirect("/dashboard");
   return {
     success: true,
-    user: json.user,
     errors: {},
     error: null,
   };

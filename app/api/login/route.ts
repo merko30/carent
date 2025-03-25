@@ -42,10 +42,11 @@ export const POST = async (req: Request) => {
   });
 
   const cookieStore = await cookies();
-  cookieStore.set("token", token, {
+
+  cookieStore.set("session", token, {
     maxAge: 1000 * 60 * 60 * 24,
+    secure: process.env.NODE_ENV === "production",
     httpOnly: true,
-    sameSite: "strict",
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
   });
 
