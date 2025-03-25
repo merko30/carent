@@ -34,7 +34,7 @@ const Form = () => {
   }, [state.success]);
 
   return (
-    <form className="mt-8 space-y-6" action={formAction}>
+    <form action={formAction}>
       {state.error && (
         <Alert variant="error">
           {state.error.message || "Došlo je do greške"}
