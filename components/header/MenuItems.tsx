@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { useAuthStore } from "@/store/auth";
 
 interface MenuItemsProps {
   isOpen: boolean;
@@ -8,7 +9,7 @@ interface MenuItemsProps {
 }
 
 const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
-  const isAuthenticated = false;
+  const { isAuthenticated, logout } = useAuthStore();
 
   const menuItems = useMemo(
     () => [
@@ -59,6 +60,16 @@ const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
           </Link>
         </li>
       ))}
+      {isAuthenticated && (
+        <li>
+          <button
+            onClick={logout}
+            className="w-full block p-4 cursor-pointer border-b md:border-b-0 text-gray-800 border-b-gray-50 hover:bg-gray-50 md:hover:bg-transparent md:hover:text-black"
+          >
+            Logout
+          </button>
+        </li>
+      )}
     </ul>
   );
 };

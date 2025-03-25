@@ -2,14 +2,13 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import Link from "next/link";
 
 import Field from "@/components/Field";
-
-import loginFn, { type LoginResponse } from "./action";
-
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
-import Link from "next/link";
+
+import loginFn, { type LoginResponse } from "./action";
 
 export const initialState: LoginResponse = {
   error: null,
