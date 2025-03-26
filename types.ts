@@ -10,6 +10,9 @@ interface User {
   username: string;
   email: string;
   avatar: string | null;
+  _count?: {
+    vehicles: number;
+  };
 }
 
 interface VehicleImage {

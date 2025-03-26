@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     SITE_URL: process.env.SITE_URL,
     JWT_SECRET: process.env.JWT_SECRET,
   },
+  images: {
+    domains: ["placehold.co"],
+  },
 };
 
 export default nextConfig;

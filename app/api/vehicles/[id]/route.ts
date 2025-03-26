@@ -21,7 +21,13 @@ export const GET = async (
     include: {
       brand: true,
       images: true,
-      owner: true,
+      owner: {
+        include: {
+          _count: {
+            select: { vehicles: true },
+          },
+        },
+      },
     },
   });
 
