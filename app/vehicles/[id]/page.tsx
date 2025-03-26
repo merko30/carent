@@ -57,7 +57,10 @@ const VehiclePage = async ({
                 {/* <Fuel /> */}
                 icon
               </FeatureItem>
-              <FeatureItem value={vehicle.numberOfSeats} label="Broj sjedišta">
+              <FeatureItem
+                value={vehicle.numberOfSeats as number}
+                label="Broj sjedišta"
+              >
                 {/* icon */}
                 {/* <Armchair /> */}
                 icon

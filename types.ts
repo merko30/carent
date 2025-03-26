@@ -1,3 +1,5 @@
+import type { Vehicle as _Vehicle, CarType, Fuel } from "@prisma/client";
+
 export interface Brand {
   id: number;
   name: string;
@@ -15,36 +17,10 @@ interface VehicleImage {
   url: string;
 }
 
-export enum TypeOfFuel {
-  GASOLINE = "GASOLINE",
-  DIESEL = "DIESEL",
-  ELECTRIC = "ELECTRIC",
-  HYBRID = "HYBRID",
-}
-
-export enum Type {
-  SEDAN = "SEDAN",
-  COUPE = "COUPE",
-  HATCHBACK = "HATCHBACK",
-  CONVERTIBLE = "CONVERTIBLE",
-  SUV = "SUV",
-  TRUCK = "TRUCK",
-  VAN = "VAN",
-}
-
-export interface Vehicle {
-  id: number;
-  model: string;
+export interface Vehicle extends _Vehicle {
   brand: Brand;
-  brandId: number;
-  type: Type;
-  numberOfDoors: number;
-  numberOfSeats: number;
-  color: string;
+  type: CarType;
+  typeOfFuel: Fuel;
   owner: User;
-  features: Record<string, boolean | string | number>;
-  typeOfFuel: TypeOfFuel;
   images: VehicleImage[];
-  year: number;
-  price: number;
 }

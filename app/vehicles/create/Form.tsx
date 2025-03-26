@@ -196,7 +196,6 @@ const Form = ({ brands }: { brands: Brand[] }) => {
             defaultValue={state.data?.price}
             label="Cijena"
             type="number"
-            step={200}
           />
         </div>
       </div>

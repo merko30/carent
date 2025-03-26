@@ -1,5 +1,4 @@
-import { TypeOfFuel, Vehicle } from "@/types";
-import { CarType } from "@prisma/client";
+import { CarType, Fuel, Vehicle } from "@prisma/client";
 import { z } from "zod";
 
 export interface State {
@@ -81,7 +80,7 @@ const createVehicleFn = async (
       price: rawFormData.price,
       type: rawFormData.type as CarType,
       color: rawFormData.color,
-      typeOfFuel: rawFormData.typeOfFuel as TypeOfFuel,
+      typeOfFuel: rawFormData.typeOfFuel as Fuel,
       numberOfDoors: rawFormData.numberOfDoors,
       numberOfSeats: rawFormData.numberOfSeats,
       features: rawFormData.features,
