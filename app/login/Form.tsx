@@ -1,13 +1,12 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import Field from "@/components/Field";
 import Alert from "@/components/Alert";
-import Button from "@/components/Button";
+import SubmitButton from "@/components/SubmitButton";
 
 import loginFn, { type LoginResponse } from "./action";
 
@@ -53,7 +52,7 @@ const Form = () => {
         name="password"
         error={state.errors?.password}
       />
-      <SubmitButton />
+      <SubmitButton label="Prijavi se" loadingLabel="Prijavljivanje" />
 
       <div className="text-center">
         <Link
@@ -68,13 +67,3 @@ const Form = () => {
 };
 
 export default Form;
-
-const SubmitButton = () => {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" disabled={pending}>
-      {pending ? "Prijavljivanje..." : "Prijavi se"}
-    </Button>
-  );
-};
