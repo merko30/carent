@@ -6,6 +6,7 @@ import FeatureItem from "@/components/FeatureItem";
 
 import { FUEL_TYPE_TRANSLATIONS } from "@/constants/features";
 import { VehicleWithRating } from "@/types";
+import RentalSummary from "@/components/RentalSummary";
 
 const loadVehicle = async (
   id: string
@@ -105,19 +106,7 @@ const VehiclePage = async ({
           </div>
         </div>
         <div className="w-1/3">
-          <div className="p-4">
-            <h2 className="text-2xl font-semibold leading-snug">
-              <span className="text-orange-400 font-semibold">
-                {vehicle.price} KM
-              </span>{" "}
-              ukupno
-            </h2>
-            <p className="text-gray-400 text-sm mb-4">
-              {vehicle.price} KM po danu
-            </p>
-            <hr className="text-gray-300 my-5" />
-            date pickers
-          </div>
+          <RentalSummary vehicle={vehicle} />
         </div>
       </div>
     </Container>

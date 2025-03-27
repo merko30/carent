@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+.rdp-root {
+  --rdp-accent-color: var(--color-orange-400) !important;
+  --rdp-accent-background-color: var(--color-orange-100) !important;
+}
