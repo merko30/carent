@@ -21,6 +21,7 @@ model User {
   rentals    RentingVehicles[]
   vehicles Vehicle[] @relation(name:"owner")
   reviews Review[]
+  reviewReceived Review[] @relation(name:"Recipient")
 }
 
 model Brand {
@@ -69,10 +70,10 @@ enum PricePeriod {
 
 model Review {
   id        Int      @id @default(autoincrement())
-  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
-  vehicleId Int
-  author      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    Int
+  recipient       User     @relation(fields: [recipientId], references: [id], name:"Recipient")
+  recipientId    Int
   rating    Float
   comment   String?
   createdAt DateTime @default(now())
@@ -89,7 +90,6 @@ model Vehicle {
   numberOfDoors Int?
   numberOfSeats Int?
   description String?
-  reviews   Review[]
   images    VehicleImage[]
   type CarType @default(SEDAN)
   typeOfFuel Fuel

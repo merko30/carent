@@ -5,14 +5,11 @@ export interface Brand {
   name: string;
 }
 
-interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
   avatar: string | null;
-  _count?: {
-    vehicles: number;
-  };
 }
 
 interface VehicleImage {
@@ -20,11 +17,18 @@ interface VehicleImage {
   url: string;
 }
 
+export interface Owner extends User {
+  rating: number;
+  _count: {
+    vehicles: number;
+  };
+}
+
 export interface Vehicle extends _Vehicle {
   brand: Brand;
   type: CarType;
   typeOfFuel: Fuel;
-  owner: User;
+  owner: Owner;
   images: VehicleImage[];
 }
 

@@ -1,12 +1,10 @@
 import Image from "next/image";
-import { Seat, GasPump, Star } from "@phosphor-icons/react/dist/ssr";
 
 import Container from "@/components/Container";
-import FeatureItem from "@/components/FeatureItem";
-
-import { FUEL_TYPE_TRANSLATIONS } from "@/constants/features";
 import { VehicleWithRating } from "@/types";
 import RentalSummary from "@/components/RentalSummary";
+import Features from "./Features";
+import OwnerInfo from "./OwnerInfo";
 
 const loadVehicle = async (
   id: string
@@ -33,8 +31,6 @@ const VehiclePage = async ({
 
   console.log(vehicle);
 
-  const vehicleCount = vehicle.owner._count?.vehicles ?? 1;
-  const vehicleSinglePluralLabel = vehicleCount === 1 ? "vozilo" : "vozila";
   return (
     <Container>
       <div className="w-full border-2 border-gray-100 mb-4">
@@ -54,55 +50,13 @@ const VehiclePage = async ({
           <h1 className="text-4xl font-semibold mb-6">
             {vehicle?.brand.name} {vehicle?.model}
           </h1>
-          <div className="flex items-center gap-4 pb-4">
-            <FeatureItem
-              label="Tip goriva"
-              value={
-                FUEL_TYPE_TRANSLATIONS[
-                  vehicle.typeOfFuel as keyof typeof FUEL_TYPE_TRANSLATIONS
-                ]
-              }
-            >
-              <GasPump size={24} />
-            </FeatureItem>
-            <FeatureItem
-              value={vehicle.numberOfSeats as number}
-              label="Broj sjedišta"
-            >
-              <Seat size={24} />
-            </FeatureItem>
-          </div>
+          <Features vehicle={vehicle} />
           <div className="flex gap-6 items-center py-8 border-y border-gray-300">
-            <div className="flex gap-3">
-              <p className="text-lg uppercase transform rotate-90 -ml-8">
-                VLASNIK
-              </p>
-              <Image
-                src={vehicle.owner.avatar ?? "https://placehold.co/64x64.png"}
-                width="64"
-                height="64"
-                alt={vehicle.owner.username}
-                className="w-16 h-16 rounded-full"
-              />
-            </div>
-            <div>
-              <h1 className="text-lg font-medium">{vehicle.owner.username}</h1>
-              <p>
-                <span>
-                  {vehicle.owner._count!.vehicles} {vehicleSinglePluralLabel}
-                </span>
-                <span className="text-gray-500"> | </span>
-                <span className="inline-flex items-center gap-2">
-                  <Star weight="fill" fill="gold" />
-                  {vehicle.rating ? vehicle.rating : "Nema ocjene"}
-                </span>
-              </p>
-            </div>
-            {vehicle.description && (
-              <div className="border-b border-gray-300 mb-4">
-                <p>{vehicle.description}</p>
-              </div>
-            )}
+            <OwnerInfo owner={vehicle.owner} />
+          </div>
+          <div className="py-8 border-y border-gray-300">
+            <h2 className="text-2xl font-semibold mb-4">Opis</h2>
+            <p>{vehicle.description}</p>
           </div>
         </div>
         <div className="w-1/3">
