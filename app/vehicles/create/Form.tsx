@@ -24,6 +24,7 @@ export const initialState: State = {
     numberOfDoors: undefined,
     numberOfSeats: undefined,
     color: undefined,
+    description: undefined,
     features: {},
   },
 };
@@ -34,15 +35,15 @@ const Form = ({ brands }: { brands: Brand[] }) => {
   return (
     <form
       action={action}
-      className="bg-white border border-gray-200 rounded-md w-full lg:w-3/4 p-4"
+      className="bg-white border border-gray-200 rounded-md w-full lg:w-3/4"
     >
       {state.error && (
         <Alert variant="error">
           {state.error.message || "Došlo je do greške"}
         </Alert>
       )}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <div className="w-full md:w-2/3 h-full overflow-hidden">
+      <div className="h-full flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-2/3 h-full overflow-hidden p-4">
           <div className="w-full flex gap-4">
             <Field
               name="model"
@@ -69,6 +70,15 @@ const Form = ({ brands }: { brands: Brand[] }) => {
               ))}
             </Field>
           </div>
+          <Field
+            type="textarea"
+            name="description"
+            error={state.errors.description}
+            defaultValue={state.data?.description}
+            label="Opis"
+            className="w-full"
+            rows={4}
+          />
           <div className="w-full flex gap-4">
             <Field
               name="year"
@@ -189,17 +199,23 @@ const Form = ({ brands }: { brands: Brand[] }) => {
           </div> */}
           {/* </div>} */}
         </div>
-        <div className="w-full md:w-1/3 h-full p-0 md:p-4">
-          <Field
-            name="price"
-            error={state.errors.price}
-            defaultValue={state.data?.price}
-            label="Cijena"
-            type="number"
-          />
+        <div className="w-full md:w-1/3 min-h-full p-0 bg-gray-50">
+          <div className="h-full flex flex-col p-4">
+            <Field
+              name="price"
+              error={state.errors.price}
+              defaultValue={state.data?.price}
+              label="Cijena"
+              type="number"
+            />
+            <SubmitButton
+              label="Dodaj vozilo"
+              loadingLabel="Dodavanje vozila..."
+              className="mt-auto"
+            />
+          </div>
         </div>
       </div>
-      <SubmitButton label="Dodaj vozilo" loadingLabel="Dodavanje vozila..." />
     </form>
   );
 };

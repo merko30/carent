@@ -1,4 +1,9 @@
-import { ReactNode, InputHTMLAttributes, SelectHTMLAttributes } from "react";
+import {
+  ReactNode,
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from "react";
 import { twMerge } from "tailwind-merge";
 
 interface BaseFieldProps {
@@ -19,12 +24,17 @@ export default function Field({
   children,
   name,
   ...props
-}: BaseFieldProps & InputHTMLAttributes<HTMLInputElement>) {
+}: BaseFieldProps &
+  (
+    | InputHTMLAttributes<HTMLInputElement>
+    | TextareaHTMLAttributes<HTMLTextAreaElement>
+  )) {
   const isCheckbox = type === "checkbox";
 
   const inputClassName = twMerge(
     "w-full border border-gray-300 rounded-sm p-2 bg-white",
-    type === "checkbox" ? "size-auto" : "",
+    type !== "textarea" ? "h-12" : "",
+    isCheckbox ? "size-auto" : "",
     inputClass
   );
 
@@ -43,7 +53,14 @@ export default function Field({
           {label}
         </label>
       )}
-      {type === "select" ? (
+      {type === "textarea" && (
+        <textarea
+          name={name}
+          className={inputClassName}
+          {...(props as TextareaHTMLAttributes<HTMLTextAreaElement>)}
+        />
+      )}
+      {type === "select" && (
         <select
           {...(props as SelectHTMLAttributes<HTMLSelectElement>)}
           name={name}
@@ -51,8 +68,14 @@ export default function Field({
         >
           {children}
         </select>
-      ) : (
-        <input type={type} name={name} className={inputClassName} {...props} />
+      )}
+      {(!type || !["select", "textarea"].includes(type)) && (
+        <input
+          type={type}
+          name={name}
+          className={inputClassName}
+          {...(props as InputHTMLAttributes<HTMLInputElement>)}
+        />
       )}
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>

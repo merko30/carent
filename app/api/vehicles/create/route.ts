@@ -31,11 +31,6 @@ export const POST = async (req: Request) => {
       data: {
         ...body,
         ownerId: parseInt(userId),
-        brandId: parseInt(body.brandId),
-        year: parseInt(body.year),
-        price: parseInt(body.price),
-        numberOfDoors: parseInt(body.numberOfDoors),
-        numberOfSeats: parseInt(body.numberOfSeats),
       },
     });
 

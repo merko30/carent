@@ -1,23 +1,26 @@
 import { CarType, Fuel, Vehicle } from "@prisma/client";
 import { z } from "zod";
 
+interface VehicleFormData {
+  brandId?: string;
+  model?: string;
+  year?: string;
+  price?: string;
+  type?: string;
+  typeOfFuel?: string;
+  numberOfDoors?: string;
+  numberOfSeats?: string;
+  color?: string;
+  features: Record<string, string | boolean | number>;
+  description?: string;
+}
+
 export interface State {
   errors: Record<string, string>;
   success: boolean;
   error: { message: string } | null;
   vehicle: Vehicle | null;
-  data?: {
-    brandId?: string;
-    model?: string;
-    year?: string;
-    price?: string;
-    type?: string;
-    typeOfFuel?: string;
-    numberOfDoors?: string;
-    numberOfSeats?: string;
-    color?: string;
-    features: Record<string, string | boolean | number>;
-  };
+  data?: VehicleFormData;
 }
 
 const createVehicleFn = async (
@@ -44,7 +47,7 @@ const createVehicleFn = async (
     brandId: z.string().nonempty("Molimo odaberite marku vozila"),
     model: z.string().nonempty("Molimo odaberite model vozila"),
     year: z.string().nonempty("Molimo odaberite godište vozila"),
-    price: z.string().nonempty("Molimo odaberite cienu vozila"),
+    price: z.string().nonempty("Molimo odaberite cijenu vozila"),
     type: z.string().nonempty("Molimo odaberite tip vozila"),
     typeOfFuel: z.string().nonempty("Molimo odaberite vrstu goriva"),
     // numberOfDoors: z.string().nonempty("Morate uneti broj vrata"),
@@ -76,13 +79,13 @@ const createVehicleFn = async (
     body: JSON.stringify({
       brandId: parseInt(rawFormData.brandId!),
       model: rawFormData.model,
-      year: rawFormData.year,
-      price: rawFormData.price,
+      year: parseInt(rawFormData.year!),
+      price: parseInt(rawFormData.price!),
       type: rawFormData.type as CarType,
       color: rawFormData.color,
       typeOfFuel: rawFormData.typeOfFuel as Fuel,
-      numberOfDoors: rawFormData.numberOfDoors,
-      numberOfSeats: rawFormData.numberOfSeats,
+      numberOfDoors: parseInt(rawFormData.numberOfDoors!),
+      numberOfSeats: parseInt(rawFormData.numberOfSeats!),
       features: rawFormData.features,
     }),
   });
