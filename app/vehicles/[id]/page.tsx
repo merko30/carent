@@ -5,12 +5,12 @@ import Container from "@/components/Container";
 import FeatureItem from "@/components/FeatureItem";
 
 import { FUEL_TYPE_TRANSLATIONS } from "@/constants/features";
-import { Vehicle } from "@/types";
+import { VehicleWithRating } from "@/types";
 
 const loadVehicle = async (
   id: string
 ): Promise<{
-  vehicle: Vehicle;
+  vehicle: VehicleWithRating;
 }> => {
   const response = await fetch(`${process.env.SITE_URL}/api/vehicles/${id}`);
   const data = await response.json();
@@ -92,11 +92,16 @@ const VehiclePage = async ({
                 </span>
                 <span className="text-gray-500"> | </span>
                 <span className="inline-flex items-center gap-2">
-                  4.5
                   <Star weight="fill" fill="gold" />
+                  {vehicle.rating ? vehicle.rating : "Nema ocjene"}
                 </span>
               </p>
             </div>
+            {vehicle.description && (
+              <div className="border-b border-gray-300 mb-4">
+                <p>{vehicle.description}</p>
+              </div>
+            )}
           </div>
         </div>
         <div className="w-1/3">

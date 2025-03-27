@@ -27,3 +27,7 @@ export interface Vehicle extends _Vehicle {
   owner: User;
   images: VehicleImage[];
 }
+
+export interface VehicleWithRating extends Vehicle {
+  rating: number;
+}

@@ -35,5 +35,19 @@ export const GET = async (
     return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ vehicle });
+  const rating = await prisma.review.aggregate({
+    where: {
+      vehicleId: parseInt(id),
+    },
+    _avg: {
+      rating: true,
+    },
+  });
+
+  return NextResponse.json({
+    vehicle: {
+      ...vehicle,
+      rating: rating._avg.rating,
+    },
+  });
 };
