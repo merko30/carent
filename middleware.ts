@@ -38,21 +38,12 @@ async function authMiddleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// async function refreshSessionMiddleware(req: NextRequest) {
-//   const sessionCookie = (await cookies()).get("session");
-
-//   if (sessionCookie?.value) {
-//     const cookieStore = await cookies();
-//     cookieStore.set("session", sessionCookie.value, {
-//       maxAge: 60 * 60 * 24,
-//       secure: process.env.NODE_ENV === "production",
-//       httpOnly: true,
-//     });
-//   }
-
-//   return NextResponse.next();
-// }
-
 export async function middleware(req: NextRequest) {
   return authMiddleware(req);
 }
+//    // matches /vehicles/:id/edit
+//    if (pathname.match(/\/vehicles\/\d+\/edit/)) {
+//     return authorizationMiddleware(req);
+//   }
+
+// }

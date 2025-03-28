@@ -1,13 +1,18 @@
 "use client";
 
+import { useActionState, useEffect } from "react";
+
 import Field from "@/components/Field";
 import SubmitButton from "@/components/SubmitButton";
 import { COLORS } from "@/constants/colors";
 // import { CAR_FEATURES } from "@/constants/features";
 import { Brand } from "@/types";
-import { useActionState } from "react";
-import createVehicleFn, { State } from "./action";
+// import createVehicleFn, { State } from "./action";
 import Alert from "@/components/Alert";
+
+import { State } from "./type";
+import { redirect, useParams } from "next/navigation";
+import toast from "react-hot-toast";
 
 export const initialState: State = {
   error: null,
@@ -29,8 +34,33 @@ export const initialState: State = {
   },
 };
 
-const Form = ({ brands }: { brands: Brand[] }) => {
-  const [state, action] = useActionState(createVehicleFn, initialState);
+const Form = ({
+  brands,
+  actionFn,
+  data,
+}: {
+  brands: Brand[];
+  actionFn: (data: any, formData: FormData) => Promise<any>;
+  data?: any;
+}) => {
+  const params = useParams();
+  const [state, action] = useActionState(actionFn, {
+    ...initialState,
+    data: {
+      ...initialState.data,
+      ...data,
+    },
+  });
+
+  useEffect(() => {
+    if (state.success) {
+      if (params.id) {
+        toast.success("Uspješno ste uredili vozilo");
+      } else {
+        redirect(`/vehicles/$${state.vehicle?.id}`);
+      }
+    }
+  });
 
   return (
     <form
@@ -60,7 +90,7 @@ const Form = ({ brands }: { brands: Brand[] }) => {
               label="Brend"
               className="flex-1"
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Odaberi
               </option>
               {brands.map((brand) => (
@@ -88,7 +118,7 @@ const Form = ({ brands }: { brands: Brand[] }) => {
               className="flex-1"
               type="select"
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Odaberi
               </option>
               {Array.from(
@@ -108,7 +138,7 @@ const Form = ({ brands }: { brands: Brand[] }) => {
               label="Tip vozila"
               className="flex-1"
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Odaberi
               </option>
               <option value="SEDAN">Limuzina</option>
@@ -123,7 +153,7 @@ const Form = ({ brands }: { brands: Brand[] }) => {
               label="Vrsta goriva"
               className="flex-1"
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Odaberi
               </option>
               <option value="GASOLINE">Benzin</option>
@@ -209,8 +239,10 @@ const Form = ({ brands }: { brands: Brand[] }) => {
               type="number"
             />
             <SubmitButton
-              label="Dodaj vozilo"
-              loadingLabel="Dodavanje vozila..."
+              label={params.id ? "Sačuvaj izmjene" : "Dodaj vozilo"}
+              loadingLabel={
+                params.id ? "Čuvanje izmjena..." : "Dodavanje vozila..."
+              }
               className="mt-auto"
             />
           </div>

@@ -2,7 +2,9 @@ import Container from "@/components/Container";
 
 import { Brand } from "@/types";
 
-import Form from "./Form";
+import Form from "@/components/VehicleForm";
+
+import action from "./action";
 
 const loadBrands = async (): Promise<{ brands: Brand[] }> => {
   const response = await fetch(`${process.env.SITE_URL}/api/brands`);
@@ -16,7 +18,7 @@ const CreateVehicle = async () => {
     <Container>
       <div className="flex flex-col items-center">
         <h1 className="text-4xl font-semibold mb-8">Dodaj novo vozilo</h1>
-        <Form brands={brands} />
+        <Form brands={brands} actionFn={action} />
       </div>
     </Container>
   );

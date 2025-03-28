@@ -1,8 +1,10 @@
 import Image from "next/image";
 
 import Container from "@/components/Container";
-import { VehicleWithRating } from "@/types";
 import RentalSummary from "@/components/RentalSummary";
+
+import { VehicleWithRating } from "@/types";
+
 import Features from "./Features";
 import OwnerInfo from "./OwnerInfo";
 
@@ -54,10 +56,12 @@ const VehiclePage = async ({
           <div className="flex gap-6 items-center py-8 border-y border-gray-300">
             <OwnerInfo owner={vehicle.owner} />
           </div>
-          <div className="py-8 border-y border-gray-300">
-            <h2 className="text-2xl font-semibold mb-4">Opis</h2>
-            <p>{vehicle.description}</p>
-          </div>
+          {vehicle.description && (
+            <div className="py-8 border-b border-gray-300">
+              <h2 className="text-xl font-semibold mb-4">Opis</h2>
+              <p>{vehicle.description}</p>
+            </div>
+          )}
         </div>
         <div className="w-1/3">
           <RentalSummary vehicle={vehicle} />

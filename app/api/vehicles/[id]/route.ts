@@ -54,3 +54,36 @@ export const GET = async (
     },
   });
 };
+
+export const PUT = async (
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+  const { id } = await params;
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Please provide a vehicle id" },
+      { status: 400 }
+    );
+  }
+
+  const data = await req.json();
+
+  try {
+    const vehicle = await prisma.vehicle.update({
+      where: {
+        id: parseInt(id),
+      },
+      data,
+    });
+
+    return NextResponse.json({ vehicle });
+  } catch (error) {
+    console.log("Error updating vehicle:", error);
+    return NextResponse.json(
+      { error: "Failed to update vehicle" },
+      { status: 500 }
+    );
+  }
+};
