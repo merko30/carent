@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { decrypt } from "./lib/auth";
+import { decrypt, Payload } from "./lib/auth";
+import { Role } from "@prisma/client";
 
 export const config = {
   matcher: [
@@ -49,21 +50,24 @@ async function authMiddleware(req: NextRequest) {
 const ROUTE_RULES = {
   VEHICLE_EDIT: {
     pattern: /\/vehicles\/(\d+)\/edit/,
-    check: async (userId: string, matches: RegExpMatchArray) => {
+    check: async (payload: Payload, matches: RegExpMatchArray) => {
       const vehicleId = matches[1];
-      return checkVehicleOwnership(userId, vehicleId);
+      return checkVehicleOwnership(payload.userId, vehicleId);
     },
   },
   BRAND_CREATE: {
     pattern: /\/brands\/create/,
-    check: async (userId: string) => {
-      return checkBrandCreatePermission(userId);
+    check: async (payload: Payload) => {
+      return checkBrandCreatePermission(payload);
     },
   },
 };
 
 // Helper functions for specific checks
-async function checkVehicleOwnership(userId: string, vehicleId: string) {
+async function checkVehicleOwnership(
+  userId: string,
+  vehicleId: string
+): Promise<boolean> {
   const response = await fetch(
     `${process.env.SITE_URL}/api/vehicles/${vehicleId}`
   );
@@ -72,13 +76,13 @@ async function checkVehicleOwnership(userId: string, vehicleId: string) {
   return vehicle && vehicle.ownerId.toString() === userId;
 }
 
-async function checkBrandCreatePermission(userId: string) {
-  const response = await fetch(
-    `${process.env.SITE_URL}/api/users/${userId}/permissions`
-  );
-  const { permissions } = await response.json();
+async function checkBrandCreatePermission(payload: Payload): Promise<boolean> {
+  console.log("Checking brand create permission for user:", payload);
+  if (payload.role == Role.ADMIN) {
+    return true;
+  }
 
-  return permissions?.includes("brand:create");
+  return false;
 }
 
 async function authorizationMiddleware(req: NextRequest) {
@@ -90,13 +94,13 @@ async function authorizationMiddleware(req: NextRequest) {
     return redirectToLogin(req, pathname);
   }
 
-  const { userId } = await decrypt(sessionCookie.value);
+  const session = await decrypt(sessionCookie.value);
 
   // Check each route pattern and apply corresponding rules
   for (const [, rule] of Object.entries(ROUTE_RULES)) {
     const matches = pathname.match(rule.pattern);
     if (matches) {
-      const isAuthorized = await rule.check(userId, matches);
+      const isAuthorized = await rule.check(session, matches);
       if (!isAuthorized) {
         return redirectToDashboard(req);
       }

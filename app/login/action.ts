@@ -65,10 +65,7 @@ export default async function loginFn(
     };
   }
 
-  await createSession({
-    id: user.id.toString(),
-    // roles: user.roles,
-  });
+  await createSession(user);
 
   // navigate
   return {

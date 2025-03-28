@@ -1,9 +1,11 @@
+import { Role, User } from "@prisma/client";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-type Payload = {
+export type Payload = {
   userId: string;
   expires: number;
+  role: Role;
 };
 
 export const decrypt = async (token: string) => {
@@ -43,10 +45,11 @@ const encrypt = (payload: Payload) => {
     .sign(secret);
 };
 
-export const createSession = async (user: { id: string }) => {
+export const createSession = async (user: User) => {
   const payload: Payload = {
     expires: Date.now() * 60 * 60 * 24,
-    userId: user.id,
+    userId: user.id.toString(),
+    role: user.role,
   };
 
   const cookieStore = await cookies();

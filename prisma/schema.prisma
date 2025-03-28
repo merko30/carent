@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -22,6 +27,7 @@ model User {
   vehicles Vehicle[] @relation(name:"owner")
   reviews Review[]
   reviewReceived Review[] @relation(name:"Recipient")
+  role      Role     @default(USER)
 }
 
 model Brand {
