@@ -22,11 +22,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} antialiased`}>
+    <html lang="bs" className="h-full">
+      <body
+        className={`${geistSans.variable} antialiased min-h-screen h-full flex flex-col`}
+      >
         <AuthProvider>
           <Header />
-          {children}
+          <main className="flex-1 h-full">{children}</main>
           <Toaster
             toastOptions={{
               position: "bottom-center",

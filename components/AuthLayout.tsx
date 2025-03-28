@@ -1,19 +1,13 @@
-import { ReactNode } from "react";
-
-interface AuthLayoutProps {
-  children: ReactNode;
-  onSubmit?: (e: React.FormEvent) => void;
-}
-
-export default function AuthLayout({ children, onSubmit }: AuthLayoutProps) {
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="container mx-auto px-4 md:px-0 pt-20">
-      <form
-        className="w-full md:w-2/3 lg:w-1/2 mx-auto p-8 bg-white border border-gray-300 rounded-sm"
-        onSubmit={onSubmit}
-      >
+    <div className="h-full flex items-center justify-center bg-gray-50 py-20">
+      <div className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 p-4 sm:p-6 lg:p-8 bg-white border border-gray-300 rounded-lg">
         {children}
-      </form>
+      </div>
     </div>
   );
 }

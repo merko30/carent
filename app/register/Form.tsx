@@ -1,15 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import Field from "@/components/Field";
 
 import registerFn, { type RegisterResponse } from "./action";
 
 import Alert from "@/components/Alert";
-import Button from "@/components/Button";
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 
 export const initialState: RegisterResponse = {
   error: null,
@@ -61,7 +60,11 @@ const Form = () => {
         error={state.errors?.confirmPassword}
       />
 
-      <SubmitButton />
+      <SubmitButton
+        label="Registruj se"
+        loadingLabel="Registracija u toku"
+        className="w-full"
+      />
 
       <div className="text-center">
         <Link
@@ -76,13 +79,3 @@ const Form = () => {
 };
 
 export default Form;
-
-const SubmitButton = () => {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" disabled={pending}>
-      {pending ? "Učitavanje..." : "Registruj se"}
-    </Button>
-  );
-};

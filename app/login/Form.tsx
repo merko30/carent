@@ -52,7 +52,11 @@ const Form = () => {
         name="password"
         error={state.errors?.password}
       />
-      <SubmitButton label="Prijavi se" loadingLabel="Prijavljivanje" />
+      <SubmitButton
+        label="Prijavi se"
+        loadingLabel="Prijavljivanje"
+        className="w-full"
+      />
 
       <div className="text-center">
         <Link
