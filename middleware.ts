@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { decrypt, Payload } from "./lib/auth";
-import { Role } from "@prisma/client";
+
+import { decrypt } from "./lib/auth";
+import { AUTH_PAGES, PROTECTED_PAGES, ROUTE_RULES } from "./lib/middleware";
 
 export const config = {
   matcher: [
@@ -16,14 +17,11 @@ export const config = {
   ],
 };
 
-const redirectToDashboard = (req: Request) =>
+export const redirectToDashboard = (req: Request) =>
   NextResponse.redirect(new URL("/dashboard", req.url));
 
-const redirectToLogin = (req: Request, from: string) =>
+export const redirectToLogin = (req: Request, from: string) =>
   NextResponse.redirect(new URL(`/login${from ? `?to=${from}` : ""}`, req.url));
-
-const AUTH_PAGES = ["/login", "/register"];
-const PROTECTED_PAGES = ["/dashboard", "/profile"]; // Add pages that require authentication
 
 async function authMiddleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -44,45 +42,6 @@ async function authMiddleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
-
-// Define route patterns and their authorization rules
-const ROUTE_RULES = {
-  VEHICLE_EDIT: {
-    pattern: /\/vehicles\/(\d+)\/edit/,
-    check: async (payload: Payload, matches: RegExpMatchArray) => {
-      const vehicleId = matches[1];
-      return checkVehicleOwnership(payload.userId, vehicleId);
-    },
-  },
-  BRAND_CREATE: {
-    pattern: /\/brands\/create/,
-    check: async (payload: Payload) => {
-      return checkBrandCreatePermission(payload);
-    },
-  },
-};
-
-// Helper functions for specific checks
-async function checkVehicleOwnership(
-  userId: string,
-  vehicleId: string
-): Promise<boolean> {
-  const response = await fetch(
-    `${process.env.SITE_URL}/api/vehicles/${vehicleId}`
-  );
-  const { vehicle } = await response.json();
-
-  return vehicle && vehicle.ownerId.toString() === userId;
-}
-
-async function checkBrandCreatePermission(payload: Payload): Promise<boolean> {
-  console.log("Checking brand create permission for user:", payload);
-  if (payload.role == Role.ADMIN) {
-    return true;
-  }
-
-  return false;
 }
 
 async function authorizationMiddleware(req: NextRequest) {
