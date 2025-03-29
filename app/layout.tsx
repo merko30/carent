@@ -25,11 +25,11 @@ export default function RootLayout({
   return (
     <html lang="bs" className="h-full">
       <body
-        className={`${openSans.variable} antialiased min-h-screen h-full flex flex-col`}
+        className={`${openSans.variable} antialiased min-h-screen flex flex-col`}
       >
         <AuthProvider>
           <Header />
-          <main className="flex-1 h-full">{children}</main>
+          <main className="flex-1">{children}</main>
           <Toaster
             toastOptions={{
               position: "bottom-center",
