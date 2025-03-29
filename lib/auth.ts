@@ -28,8 +28,8 @@ export const decrypt = async (token: string) => {
     return payload as Payload;
   } catch (error) {
     console.error("JWT verification failed:", error);
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
+    // const cookieStore = await cookies();
+    // cookieStore.delete("session");
     throw new Error("Failed to verify the token.");
   }
 };

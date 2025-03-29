@@ -1,9 +1,7 @@
-import Container from "@/components/Container";
-
-export default function Dashboard() {
+export default async function Dashboard() {
   return (
-    <Container>
-      <h1>Dashboard</h1>
-    </Container>
+    <div>
+      <h1>home</h1>
+    </div>
   );
 }
