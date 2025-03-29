@@ -35,6 +35,7 @@ const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
 
   const logout = async () => {
     await logoutFn();
+    if (onNavigate) onNavigate();
     redirect("/login");
   };
 
@@ -54,7 +55,7 @@ const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
           <li key={index} className="w-full md:w-auto">
             <Link
               href={item.to}
-              className="w-full block p-4 cursor-pointer border-b md:border-b-0 text-gray-800 border-b-gray-50 hover:bg-gray-50 md:hover:bg-transparent md:hover:text-black"
+              className="w-full md:w-max block text-sm font-medium flex-none p-4 cursor-pointer text-gray-800 hover:underline md:hover:text-black"
               onClick={onNavigate}
             >
               {item.title}
@@ -63,7 +64,7 @@ const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
         ))}
         {isAuthenticated && (
           <li className="w-full">
-            <Button onClick={logout} className="w-full">
+            <Button onClick={logout} className="w-full font-medium" size="sm">
               Logout
             </Button>
           </li>
