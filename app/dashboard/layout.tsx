@@ -44,9 +44,9 @@ export default async function Dashboard({
   return (
     <Container>
       <Header user={user} />
-      <div className="flex gap-4">
+      <div className="flex gap-8">
         <Sidebar />
-        <div className="w-2/3">{children}</div>
+        <div className="w-2/3 lg:w-3/4">{children}</div>
       </div>
     </Container>
   );

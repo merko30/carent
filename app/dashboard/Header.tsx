@@ -4,7 +4,7 @@ import { User } from "@/types";
 
 const Header = ({ user }: { user: User }) => {
   return (
-    <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+    <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-8">
       <Image
         src={user.avatar ?? "/avatar.png"}
         alt={user.username}

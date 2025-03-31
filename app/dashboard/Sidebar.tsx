@@ -17,7 +17,7 @@ const LINKS = [
 
 const Sidebar = () => {
   return (
-    <aside className="w-1/3 bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
+    <aside className="h-fit hidden md:block md:w-1/3 lg:w-1/4 bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
       <ul className="w-full flex flex-col gap-4">
         {LINKS.map(({ icon: Icon, ...link }) => (
           <SidebarItem key={link.href} {...link}>
