@@ -4,8 +4,15 @@ import { cookies } from "next/headers";
 
 export type Payload = {
   userId: string;
-  expires: number;
   role: Role;
+};
+
+const getSecret = () => {
+  const secretEnv = process.env.JWT_SECRET;
+  if (!secretEnv) {
+    throw new Error("JWT secret is not defined.");
+  }
+  return new TextEncoder().encode(secretEnv as string);
 };
 
 export const decrypt = async (token: string) => {
@@ -15,13 +22,7 @@ export const decrypt = async (token: string) => {
     throw new Error("Invalid token format. Token must be a non-empty string.");
   }
 
-  const secretEnv = process.env.JWT_SECRET;
-
-  if (!secretEnv) {
-    throw new Error("JWT secret is not defined.");
-  }
-
-  const secret = new TextEncoder().encode(secretEnv as string);
+  const secret = getSecret();
 
   try {
     const { payload } = await jwtVerify(token, secret);
@@ -35,34 +36,48 @@ export const decrypt = async (token: string) => {
 };
 
 const encrypt = (payload: Payload) => {
-  const secretEnv = process.env.JWT_SECRET;
-  const secret = new TextEncoder().encode(secretEnv as string);
+  const secret = getSecret();
 
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1day")
+    .setExpirationTime(process.env.JWT_EXPIRATION_TIME as string)
     .sign(secret);
 };
 
 export const createSession = async (user: User) => {
   const payload: Payload = {
-    expires: Date.now() * 60 * 60 * 24,
     userId: user.id.toString(),
     role: user.role,
   };
 
   const cookieStore = await cookies();
 
+  // one day
   const duration = 60 * 60 * 24 * 1000;
+  // 7 days
+  const refreshTokenDuration = 7 * 24 * 60 * 60 * 1000;
 
-  const session = await encrypt(payload);
+  const accessToken = await encrypt(payload);
   const expires = new Date(Date.now() + duration);
 
-  cookieStore.set("session", session, {
+  const refreshToken = await encrypt({
+    userId: user.id.toString(),
+    role: user.role,
+  });
+
+  cookieStore.set("token", accessToken, {
     maxAge: duration,
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
     expires,
+  });
+
+  cookieStore.set("refreshToken", refreshToken, {
+    maxAge: refreshTokenDuration,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    expires: new Date(Date.now() + refreshTokenDuration),
+    path: "/api/auth/refresh",
   });
 };
