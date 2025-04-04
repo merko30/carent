@@ -1,62 +1,85 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { signIn } from "next-auth/react";
+import { z } from "zod";
+import { useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import Field from "@/components/Field";
+import Button from "@/components/Button";
 import Alert from "@/components/Alert";
-import SubmitButton from "@/components/SubmitButton";
 
-import loginFn, { type LoginResponse } from "./action";
-
-export const initialState: LoginResponse = {
-  error: null,
-  errors: {},
-  success: false,
-};
+const schema = z.object({
+  email: z.string().email("Email adresa nije validna"),
+  password: z.string().min(6, "Lozinka mora imati najmanje 6 karaktera"),
+});
 
 const Form = () => {
-  const [state, formAction] = useActionState(loginFn, initialState);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const setAuthState = async () => {
-      if (state.success) {
-        await (await import("@/store/auth")).useAuthStore
-          .getState()
-          .checkAuth();
-        redirect("/dashboard");
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors({});
+    setError(null);
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    const validation = schema.safeParse(data);
+
+    if (!validation.success) {
+      const errors = validation.error.issues.reduce(
+        (acc: Record<string, string>, issue) => {
+          acc[issue.path[0]] = issue.message;
+          return acc;
+        },
+        {}
+      );
+      setErrors(errors);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        callbackUrl: "/",
+        ...data,
+      });
+
+      if (res?.error) {
+        setError("Pogrešni podaci");
+        setIsLoading(false);
+        return;
       }
-    };
 
-    setAuthState();
-  }, [state.success]);
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log("error", error.message);
+      setIsLoading(false);
+      setError("Pogrešni podaci");
+    }
+  };
 
   return (
-    <form action={formAction}>
-      {state.error && (
-        <Alert variant="error">
-          {state.error.message || "Došlo je do greške"}
-        </Alert>
-      )}
+    <form onSubmit={onSubmit}>
+      {error && <Alert variant="error">{error || "Došlo je do greške"}</Alert>}
 
-      <Field
-        label="Email"
-        type="email"
-        name="email"
-        error={state.errors?.email}
-      />
+      <Field label="Email" type="email" name="email" error={errors?.email} />
       <Field
         label="Lozinka"
         type="password"
         name="password"
-        error={state.errors?.password}
+        error={errors?.password}
       />
-      <SubmitButton
-        label="Prijavi se"
-        loadingLabel="Prijavljivanje"
-        className="w-full"
-      />
+      <Button className="w-full" disabled={isLoading}>
+        Prijavi se
+      </Button>
 
       <div className="text-center">
         <Link
