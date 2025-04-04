@@ -1,6 +1,3 @@
-import { cookies } from "next/headers";
-
-import { decrypt } from "@/lib/auth";
 import { Vehicle } from "@/types";
 
 import VehicleList from "./VehicleList";
@@ -8,13 +5,10 @@ import Button from "@/components/Button";
 import Link from "next/link";
 
 async function getVehicles(): Promise<{ vehicles: Vehicle[] }> {
-  const sessionCookie = (await cookies()).get("token");
-  const session = await decrypt(sessionCookie!.value);
+  // const sessionCookie = (await cookies()).get("token");
+  // const session = await decrypt(sessionCookie!.value);
   const response = await fetch(`${process.env.SITE_URL}/api/vehicles`, {
     method: "POST",
-    body: JSON.stringify({
-      ownerId: { equals: parseInt(session?.userId) },
-    }),
   });
   return await response.json();
 }

@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { useAuthStore } from "@/store/auth";
 import { redirect } from "next/navigation";
 import { X } from "@phosphor-icons/react/dist/ssr";
+import { useSession, signOut } from "next-auth/react";
+
 import Button from "../Button";
 
 interface MenuItemsProps {
@@ -12,7 +13,8 @@ interface MenuItemsProps {
 }
 
 const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
-  const { isAuthenticated, logout: logoutFn } = useAuthStore();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
 
   const menuItems = useMemo(
     () => [
@@ -34,7 +36,7 @@ const MenuItems = ({ isOpen, onNavigate }: MenuItemsProps) => {
   );
 
   const logout = async () => {
-    await logoutFn();
+    await signOut();
     if (onNavigate) onNavigate();
     redirect("/login");
   };

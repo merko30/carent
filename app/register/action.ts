@@ -1,5 +1,7 @@
 "use server";
 
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -55,33 +57,42 @@ export default async function registerFn(
     };
   }
 
-  const response = await fetch(`${process.env.SITE_URL}/api/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(rawFormData),
-  });
+  try {
+    const hashedPassword = await bcrypt.hash(
+      rawFormData.password as string,
+      10
+    );
 
-  const json = await response.json();
+    const createdUser = await prisma.user.create({
+      data: {
+        username: rawFormData.username as string,
+        email: rawFormData.email as string,
+        password: hashedPassword,
+      },
+    });
 
-  if (!response.ok) {
     return {
-      error: { message: json.error.message || "Došlo je do greške" },
+      error: null,
+      success: true,
+      user: createdUser,
+      errors: {},
+      formData: rawFormData,
+    };
+  } catch (error: any) {
+    console.log("Failed to create user:", error.message);
+    let message = "Došlo je do greške";
+    if (error.message?.toLowerCase().includes("unique")) {
+      message = "Korisnik već postoji";
+    }
+
+    return {
+      error: { message },
       success: false,
       user: null,
       errors: {},
       formData: rawFormData,
     };
+  } finally {
+    redirect("/login");
   }
-
-  // navigate
-  redirect("/login");
-  return {
-    success: true,
-    user: json,
-    errors: {},
-    error: null,
-    formData: rawFormData,
-  };
 }

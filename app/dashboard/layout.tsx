@@ -1,34 +1,32 @@
 import Container from "@/components/Container";
 
-import Header from "./Header";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
-import { decrypt } from "@/lib/auth";
+// import Header from "./Header";
+// import { prisma } from "@/lib/prisma";
 import Sidebar from "./Sidebar";
+import { getSession } from "next-auth/react";
 
 const loadUser = async () => {
-  const sessionCookie = (await cookies()).get("token");
+  const session = await getSession();
+  console.log("Session:", session);
 
-  const payload = await decrypt(sessionCookie!.value);
+  // const user = await prisma.user.findUnique({
+  //   where: {
+  //     id: parseInt(payload.userId),
+  //   },
+  //   include: {
+  //     vehicles: {
+  //       take: 3,
+  //     },
+  //     reviews: {
+  //       take: 3,
+  //     },
+  //     rentals: {
+  //       take: 3,
+  //     },
+  //   },
+  // });
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: parseInt(payload.userId),
-    },
-    include: {
-      vehicles: {
-        take: 3,
-      },
-      reviews: {
-        take: 3,
-      },
-      rentals: {
-        take: 3,
-      },
-    },
-  });
-
-  return { user };
+  return { user: 1 };
 };
 
 export default async function Dashboard({
@@ -43,7 +41,7 @@ export default async function Dashboard({
   }
   return (
     <Container>
-      <Header user={user} />
+      {/* <Header user={user} /> */}
       <div className="flex gap-8">
         <Sidebar />
         <div className="w-2/3 lg:w-3/4">{children}</div>
