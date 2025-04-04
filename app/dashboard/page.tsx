@@ -3,13 +3,20 @@ import { Vehicle } from "@/types";
 import VehicleList from "./VehicleList";
 import Button from "@/components/Button";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 async function getVehicles(): Promise<{ vehicles: Vehicle[] }> {
-  // const sessionCookie = (await cookies()).get("token");
-  // const session = await decrypt(sessionCookie!.value);
-  const response = await fetch(`${process.env.SITE_URL}/api/vehicles`, {
-    method: "POST",
-  });
+  const session = await getServerSession(authOptions);
+
+  const url = new URL(`${process.env.SITE_URL}/api/vehicles`);
+
+  url.searchParams.append(
+    "where",
+    JSON.stringify({ ownerId: session?.user.id })
+  );
+
+  const response = await fetch(url.toString());
   return await response.json();
 }
 

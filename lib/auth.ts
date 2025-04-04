@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
@@ -47,6 +48,21 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ baseUrl }) {
       return baseUrl;
+    },
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as Role;
+        // session.user.role = token.role;
+      }
+      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

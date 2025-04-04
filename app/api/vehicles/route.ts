@@ -3,24 +3,18 @@ import { NextResponse } from "next/server";
 
 const LIMIT = 10;
 
-export const POST = async (request: Request) => {
+export const GET = async (request: Request) => {
   try {
-    const body = await request.json();
-
-    const {
-      page = 1,
-      limit = LIMIT,
-      ...params
-    } = body || {
-      page: 1,
-      limit: LIMIT,
-    };
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || `${LIMIT}`, 10);
+    const where = JSON.parse(searchParams.get("where") ?? "{}") || {};
 
     const take = limit * page;
     const skip = take - limit;
 
     const vehicles = await prisma.vehicle.findMany({
-      where: params,
+      where,
       include: {
         brand: true,
         images: true,
