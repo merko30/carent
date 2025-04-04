@@ -1,32 +1,34 @@
+import { getServerSession } from "next-auth";
+
 import Container from "@/components/Container";
 
-// import Header from "./Header";
-// import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+import Header from "./Header";
 import Sidebar from "./Sidebar";
-import { getSession } from "next-auth/react";
 
 const loadUser = async () => {
-  const session = await getSession();
-  console.log("Session:", session);
+  const session = await getServerSession(authOptions);
 
-  // const user = await prisma.user.findUnique({
-  //   where: {
-  //     id: parseInt(payload.userId),
-  //   },
-  //   include: {
-  //     vehicles: {
-  //       take: 3,
-  //     },
-  //     reviews: {
-  //       take: 3,
-  //     },
-  //     rentals: {
-  //       take: 3,
-  //     },
-  //   },
-  // });
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session?.user.id,
+    },
+    include: {
+      vehicles: {
+        take: 3,
+      },
+      reviews: {
+        take: 3,
+      },
+      rentals: {
+        take: 3,
+      },
+    },
+  });
 
-  return { user: 1 };
+  return { user };
 };
 
 export default async function Dashboard({
@@ -41,7 +43,7 @@ export default async function Dashboard({
   }
   return (
     <Container>
-      {/* <Header user={user} /> */}
+      <Header user={user} />
       <div className="flex gap-8">
         <Sidebar />
         <div className="w-2/3 lg:w-3/4">{children}</div>

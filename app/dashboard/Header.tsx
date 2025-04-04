@@ -1,6 +1,6 @@
-import Image from "next/image";
+import { User } from "@prisma/client";
 
-import { User } from "@/types";
+import Image from "next/image";
 
 const Header = ({ user }: { user: User }) => {
   return (
