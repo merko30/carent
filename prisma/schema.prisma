@@ -16,7 +16,7 @@ enum Role {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @unique @default(cuid())
   email     String   @unique
   username  String
   password  String
@@ -28,6 +28,47 @@ model User {
   reviews Review[]
   reviewReceived Review[] @relation(name:"Recipient")
   role      Role     @default(USER)
+   accounts      Account[]
+  sessions      Session[]
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+}
+ 
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
 }
 
 model Brand {
@@ -77,9 +118,9 @@ enum PricePeriod {
 model Review {
   id        Int      @id @default(autoincrement())
   author      User     @relation(fields: [authorId], references: [id])
-  authorId    Int
+  authorId    String
   recipient       User     @relation(fields: [recipientId], references: [id], name:"Recipient")
-  recipientId    Int
+  recipientId    String
   rating    Float
   comment   String?
   createdAt DateTime @default(now())
@@ -104,7 +145,7 @@ model Vehicle {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   owner     User     @relation(name:"owner", fields: [ownerId], references: [id])
-  ownerId   Int
+  ownerId   String
   rentals RentingVehicles[]
 }
 
@@ -113,7 +154,7 @@ model RentingVehicles {
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
   vehicleId Int
   user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  userId    String
   startDate DateTime
   endDate   DateTime?
   rentDetails Json
