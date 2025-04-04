@@ -1,6 +1,9 @@
 import { Role } from "@prisma/client";
 
-import { Payload } from "./auth";
+interface Payload {
+  userId: string;
+  role: Role;
+}
 
 export const AUTH_PAGES = ["/login", "/register"];
 export const PROTECTED_PAGES = ["/dashboard", "/profile"]; // Add pages that require authentication

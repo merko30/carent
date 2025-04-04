@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getToken } from "next-auth/jwt";
 
-import { decrypt } from "./lib/auth";
-import { AUTH_PAGES, PROTECTED_PAGES, ROUTE_RULES } from "./lib/middleware";
+import { AUTH_PAGES, PROTECTED_PAGES } from "./lib/middleware";
 
 export const config = {
   matcher: [
@@ -25,18 +24,23 @@ export const redirectToLogin = (req: Request, from: string) =>
 
 async function authMiddleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const sessionCookie = (await cookies()).get("token");
+
+  // Check for session token
+  const session = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
   // auth pages case
   if (AUTH_PAGES.includes(pathname)) {
-    if (sessionCookie?.value) {
+    if (session) {
       return redirectToDashboard(req);
     }
   }
 
   // protected pages case
   if (PROTECTED_PAGES.includes(pathname)) {
-    if (!sessionCookie?.value) {
+    if (!session) {
       return redirectToLogin(req, pathname);
     }
   }
@@ -44,43 +48,41 @@ async function authMiddleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-async function authorizationMiddleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("token");
+// async function authorizationMiddleware(req: NextRequest) {
+//   const { pathname } = req.nextUrl;
 
-  if (!sessionCookie?.value) {
-    return redirectToLogin(req, pathname);
-  }
+//   const session = await getServerSession(authOptions);
 
-  const session = await decrypt(sessionCookie.value);
+//   if (!session) {
+//     return redirectToLogin(req, pathname);
+//   }
 
-  // Check each route pattern and apply corresponding rules
-  for (const [, rule] of Object.entries(ROUTE_RULES)) {
-    const matches = pathname.match(rule.pattern);
-    if (matches) {
-      const isAuthorized = await rule.check(session, matches);
-      if (!isAuthorized) {
-        return redirectToDashboard(req);
-      }
-      break;
-    }
-  }
+//   // Check each route pattern and apply corresponding rules
+//   // for (const [, rule] of Object.entries(ROUTE_RULES)) {
+//   //   const matches = pathname.match(rule.pattern);
+//   //   if (matches) {
+//   //     const isAuthorized = await rule.check(session, matches);
+//   //     if (!isAuthorized) {
+//   //       return redirectToDashboard(req);
+//   //     }
+//   //     break;
+//   //   }
+//   // }
 
-  return NextResponse.next();
-}
+//   return NextResponse.next();
+// }
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  // const { pathname } = req.nextUrl;
 
   // Check if path matches any protected route patterns
-  const isProtectedRoute = Object.values(ROUTE_RULES).some((rule) =>
-    pathname.match(rule.pattern)
-  );
+  // const isProtectedRoute = Object.values(ROUTE_RULES).some((rule) =>
+  //   pathname.match(rule.pattern)
+  // );
 
-  if (isProtectedRoute) {
-    return authorizationMiddleware(req);
-  }
+  // if (isProtectedRoute) {
+  //   return authorizationMiddleware(req);
+  // }
 
   return authMiddleware(req);
 }
