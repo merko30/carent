@@ -25,7 +25,7 @@ export const redirectToLogin = (req: Request, from: string) =>
 
 async function authMiddleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const sessionCookie = (await cookies()).get("session");
+  const sessionCookie = (await cookies()).get("token");
 
   // auth pages case
   if (AUTH_PAGES.includes(pathname)) {
@@ -47,7 +47,7 @@ async function authMiddleware(req: NextRequest) {
 async function authorizationMiddleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
+  const sessionCookie = cookieStore.get("token");
 
   if (!sessionCookie?.value) {
     return redirectToLogin(req, pathname);

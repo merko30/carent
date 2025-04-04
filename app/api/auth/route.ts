@@ -1,22 +1,13 @@
-import { cookies } from "next/headers";
-
-import { decrypt } from "@/lib/auth";
+import { Payload, routeAuthMiddleware } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const GET = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("session");
-
-  if (!token) {
-    return NextResponse.json({ isAuthenticated: false }, { status: 401 });
-  }
+  const payload = await routeAuthMiddleware();
 
   try {
-    const { userId } = await decrypt(token.value);
-
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(userId) },
+      where: { id: parseInt((payload as Payload).userId) },
       omit: { password: true },
     });
 

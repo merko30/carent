@@ -6,7 +6,7 @@ export async function POST() {
 
   const cookieStore = await cookies();
 
-  cookieStore.delete("session");
+  cookieStore.delete("token");
 
   return response;
 }

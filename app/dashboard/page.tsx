@@ -8,7 +8,7 @@ import Button from "@/components/Button";
 import Link from "next/link";
 
 async function getVehicles(): Promise<{ vehicles: Vehicle[] }> {
-  const sessionCookie = (await cookies()).get("session");
+  const sessionCookie = (await cookies()).get("token");
   const session = await decrypt(sessionCookie!.value);
   const response = await fetch(`${process.env.SITE_URL}/api/vehicles`, {
     method: "POST",

@@ -7,7 +7,7 @@ import { decrypt } from "@/lib/auth";
 import Sidebar from "./Sidebar";
 
 const loadUser = async () => {
-  const sessionCookie = (await cookies()).get("session");
+  const sessionCookie = (await cookies()).get("token");
 
   const payload = await decrypt(sessionCookie!.value);
 

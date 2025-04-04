@@ -1,6 +1,7 @@
 import { Role, User } from "@prisma/client";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export type Payload = {
   userId: string;
@@ -26,11 +27,20 @@ export const decrypt = async (token: string) => {
 
   try {
     const { payload } = await jwtVerify(token, secret);
+
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp - nowInSeconds < 5 * 60) {
+      await createSession({
+        id: payload.userId,
+        role: payload.role,
+      } as Partial<User>);
+    }
+
     return payload as Payload;
   } catch (error) {
     console.error("JWT verification failed:", error);
     // const cookieStore = await cookies();
-    // cookieStore.delete("session");
+    // cookieStore.delete("token");
     throw new Error("Failed to verify the token.");
   }
 };
@@ -45,26 +55,19 @@ const encrypt = (payload: Payload) => {
     .sign(secret);
 };
 
-export const createSession = async (user: User) => {
+export const createSession = async (user: Partial<User>) => {
   const payload: Payload = {
-    userId: user.id.toString(),
-    role: user.role,
+    userId: user.id!.toString(),
+    role: user.role!,
   };
 
   const cookieStore = await cookies();
 
   // one day
   const duration = 60 * 60 * 24 * 1000;
-  // 7 days
-  const refreshTokenDuration = 7 * 24 * 60 * 60 * 1000;
 
   const accessToken = await encrypt(payload);
   const expires = new Date(Date.now() + duration);
-
-  const refreshToken = await encrypt({
-    userId: user.id.toString(),
-    role: user.role,
-  });
 
   cookieStore.set("token", accessToken, {
     maxAge: duration,
@@ -73,6 +76,12 @@ export const createSession = async (user: User) => {
     expires,
   });
 
+  // 7 days
+  const refreshTokenDuration = 7 * 24 * 60 * 60 * 1000;
+  const refreshToken = await encrypt({
+    userId: user.id!.toString(),
+    role: user.role!,
+  });
   cookieStore.set("refreshToken", refreshToken, {
     maxAge: refreshTokenDuration,
     secure: process.env.NODE_ENV === "production",
@@ -80,4 +89,15 @@ export const createSession = async (user: User) => {
     expires: new Date(Date.now() + refreshTokenDuration),
     path: "/api/auth/refresh",
   });
+};
+
+export const routeAuthMiddleware = async () => {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("token");
+
+  if (!sessionCookie) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  return await decrypt(sessionCookie.value);
 };

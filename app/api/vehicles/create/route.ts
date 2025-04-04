@@ -1,19 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { decrypt } from "@/lib/auth";
-// import authMiddleware from "~/lib/authMiddleware";
+import { Payload, routeAuthMiddleware } from "@/lib/auth";
 
 export const POST = async (req: Request) => {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-
-  if (!sessionCookie?.value) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { userId } = await decrypt(sessionCookie.value);
+  const payload = await routeAuthMiddleware();
 
   const body = await req.json();
 
@@ -30,7 +21,7 @@ export const POST = async (req: Request) => {
     const vehicle = await prisma.vehicle.create({
       data: {
         ...body,
-        ownerId: parseInt(userId),
+        ownerId: parseInt((payload as Payload).userId),
       },
     });
 

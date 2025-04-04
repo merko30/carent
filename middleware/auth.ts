@@ -6,7 +6,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Skip middleware on the client side entirely
   if (import.meta.client) return;
 
-  const sessionCookie = useCookie("session");
+  const sessionCookie = useCookie("token");
 
   if (!sessionCookie.value) {
     if (!AUTH_PAGES.includes(to.path)) {
