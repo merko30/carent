@@ -47,7 +47,6 @@ const Form = () => {
 
     try {
       const res = await signIn("credentials", {
-        redirect: false,
         callbackUrl: "/",
         ...data,
       });

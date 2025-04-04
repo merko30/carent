@@ -4,8 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   env: {
     SITE_URL: process.env.SITE_URL,
-    JWT_SECRET: process.env.JWT_SECRET,
-    JWT_EXPIRATION_TIME: process.env.JWT_EXPIRATION_TIME,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
   images: {
     domains: ["placehold.co"],

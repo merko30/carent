@@ -1,17 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 const authOptions: NextAuthOptions = {
-  pages: {
-    signIn: "/login",
-  },
-  session: {
-    strategy: "jwt",
-  },
-  adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       name: "Credentials",
@@ -33,6 +25,7 @@ const authOptions: NextAuthOptions = {
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
+
         if (!passwordMatch) {
           throw new Error("Invalid credentials");
         }
@@ -41,6 +34,23 @@ const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  pages: {
+    signIn: "/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 60 * 24, // 1 day
+  },
+  callbacks: {
+    async signIn() {
+      return true;
+    },
+    async redirect({ baseUrl }) {
+      return baseUrl;
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
 };
 
 const handler = NextAuth(authOptions);
