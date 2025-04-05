@@ -1,4 +1,9 @@
-import type { Vehicle as _Vehicle, CarType, Fuel } from "@prisma/client";
+import type {
+  Vehicle as _Vehicle,
+  CarType,
+  Fuel,
+  RentingVehicles,
+} from "@prisma/client";
 
 export interface Brand {
   id: number;
@@ -35,3 +40,12 @@ export interface Vehicle extends _Vehicle {
 export interface VehicleWithRating extends Vehicle {
   rating: number;
 }
+
+export type RentingVehiclesWithVehicle = RentingVehicles & {
+  vehicle: {
+    brand: {
+      name: string;
+    };
+    model: string;
+  };
+};

@@ -5,9 +5,9 @@ import { Vehicle } from "@/types";
 const loadVehicles = async (): Promise<{
   vehicles: Vehicle[];
 }> => {
-  const response = await fetch(`${process.env.SITE_URL}/api/vehicles`, {
-    method: "POST",
-    body: JSON.stringify({}),
+  const url = new URL(`${process.env.SITE_URL}/api/vehicles`);
+
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
     },
