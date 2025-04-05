@@ -1,11 +1,14 @@
 import { Brand } from "@prisma/client";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+
+import { VehicleWithRating } from "@/types";
+import { authOptions } from "@/lib/auth";
 
 import VehicleForm from "@/components/VehicleForm";
-import { VehicleWithRating } from "@/types";
+import Container from "@/components/Container";
 
 import action from "./action";
-import Container from "@/components/Container";
 
 const loadVehicle = async (
   id: string
@@ -13,12 +16,19 @@ const loadVehicle = async (
   vehicle: VehicleWithRating;
   brands: Brand[];
 }> => {
+  const session = await getServerSession(authOptions);
+
   const [vehicleResponse, brandsResponse] = await Promise.all([
     fetch(`${process.env.SITE_URL}/api/vehicles/${id}`),
     fetch(`${process.env.SITE_URL}/api/brands`),
   ]);
+
   const brandsData = await brandsResponse.json();
   const data = await vehicleResponse.json();
+
+  if (!data || session?.user.id !== data.ownerId) {
+    return notFound();
+  }
 
   return { ...data, brands: brandsData.brands ?? [] };
 };
