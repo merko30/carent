@@ -1,4 +1,7 @@
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { CarType, Fuel, Vehicle } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 interface VehicleFormData {
@@ -27,6 +30,7 @@ const createVehicleFn = async (
   state: State,
   formData: FormData
 ): Promise<State> => {
+  "use server";
   const rawFormData = {
     brandId: formData.get("brandId")?.toString(),
     model: formData.get("model")?.toString(),
@@ -37,6 +41,7 @@ const createVehicleFn = async (
     color: formData.get("color")?.toString(),
     numberOfDoors: formData.get("numberOfDoors")?.toString(),
     numberOfSeats: formData.get("numberOfSeats")?.toString(),
+    description: formData.get("description")?.toString(),
     features: {},
     // description: formData.get("description"),
     // ownerId: formData.get("ownerId"),
@@ -73,52 +78,67 @@ const createVehicleFn = async (
     };
   }
 
-  const response = await fetch("/api/vehicles/create", {
-    method: "POST",
-    credentials: "include",
-    body: JSON.stringify({
-      brandId: parseInt(rawFormData.brandId!),
-      model: rawFormData.model,
-      year: parseInt(rawFormData.year!),
-      price: parseInt(rawFormData.price!),
-      type: rawFormData.type as CarType,
-      color: rawFormData.color,
-      typeOfFuel: rawFormData.typeOfFuel as Fuel,
-      numberOfDoors: parseInt(rawFormData.numberOfDoors!),
-      numberOfSeats: parseInt(rawFormData.numberOfSeats!),
-      features: rawFormData.features,
-    }),
-  });
+  const body = {
+    brandId: parseInt(rawFormData.brandId!),
+    model: rawFormData.model as string,
+    description: rawFormData.description as string,
+    year: parseInt(rawFormData.year!),
+    price: parseInt(rawFormData.price!),
+    type: rawFormData.type as CarType,
+    color: rawFormData.color as string,
+    typeOfFuel: rawFormData.typeOfFuel as Fuel,
+    numberOfDoors: parseInt(rawFormData.numberOfDoors!),
+    numberOfSeats: parseInt(rawFormData.numberOfSeats!),
+    features: rawFormData.features,
+  };
 
-  if (!response.ok) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    const vehicle = await prisma.vehicle.create({
+      data: {
+        ...body,
+        ownerId: session?.user.id as string,
+      },
+    });
+
+    return {
+      vehicle,
+      data: {
+        brandId: undefined,
+        model: undefined,
+        year: undefined,
+        price: undefined,
+        type: undefined,
+        typeOfFuel: undefined,
+        numberOfDoors: undefined,
+        numberOfSeats: undefined,
+        features: {},
+      },
+      success: true,
+      error: null,
+      errors: {},
+    };
+  } catch (error) {
+    console.log(error);
     return {
       vehicle: null,
-      data: rawFormData,
+      data: {
+        brandId: undefined,
+        model: undefined,
+        year: undefined,
+        price: undefined,
+        type: undefined,
+        typeOfFuel: undefined,
+        numberOfDoors: undefined,
+        numberOfSeats: undefined,
+        features: {},
+      },
       success: false,
-      error: { message: "Došlo je do greške" },
+      error: { message: "Greška prilikom kreiranja vozila" },
       errors: {},
     };
   }
-
-  const { vehicle } = await response.json();
-
-  return {
-    vehicle,
-    data: {
-      brandId: undefined,
-      model: undefined,
-      year: undefined,
-      price: undefined,
-      type: undefined,
-      typeOfFuel: undefined,
-      numberOfDoors: undefined,
-      numberOfSeats: undefined,
-      features: {},
-    },
-    success: true,
-    error: null,
-    errors: {},
-  };
 };
 
 export default createVehicleFn;

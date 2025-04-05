@@ -1,18 +1,17 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
+import { redirect, useParams } from "next/navigation";
+import toast from "react-hot-toast";
+
+import { Brand } from "@/types";
 
 import Field from "@/components/Field";
 import SubmitButton from "@/components/SubmitButton";
 import { COLORS } from "@/constants/colors";
-// import { CAR_FEATURES } from "@/constants/features";
-import { Brand } from "@/types";
-// import createVehicleFn, { State } from "./action";
 import Alert from "@/components/Alert";
 
 import { State } from "./type";
-import { redirect, useParams } from "next/navigation";
-import toast from "react-hot-toast";
 
 export const initialState: State = {
   error: null,
@@ -57,7 +56,7 @@ const Form = ({
       if (params.id) {
         toast.success("Uspješno ste uredili vozilo");
       } else {
-        redirect(`/vehicles/$${state.vehicle?.id}`);
+        redirect(`/vehicles/${state.vehicle?.id}`);
       }
     }
   });
