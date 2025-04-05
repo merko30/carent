@@ -7,6 +7,7 @@ import { VehicleWithRating } from "@/types";
 
 import Features from "./Features";
 import OwnerInfo from "./OwnerInfo";
+import EditLink from "./EditLink";
 
 const loadVehicle = async (
   id: string
@@ -31,8 +32,6 @@ const VehiclePage = async ({
     return null;
   }
 
-  console.log(vehicle);
-
   return (
     <Container>
       <div className="w-full border-2 border-gray-100 mb-4">
@@ -49,9 +48,12 @@ const VehiclePage = async ({
       </div>
       <div className="flex gap-4">
         <div className="w-2/3">
-          <h1 className="text-4xl font-semibold mb-6">
-            {vehicle?.brand.name} {vehicle?.model}
-          </h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-4xl font-semibold">
+              {vehicle?.brand.name} {vehicle?.model}
+            </h1>
+            <EditLink ownerId={vehicle.ownerId} />
+          </div>
           <Features vehicle={vehicle} />
           <div className="flex gap-6 items-center py-8 border-y border-gray-300">
             <OwnerInfo owner={vehicle.owner} />
