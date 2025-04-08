@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Vehicle } from "@/types";
 import Container from "./Container";
 
-const VehicleList = ({ vehicles }: { vehicles: Vehicle[] }) => (
+const VehicleList = ({ vehicles = [] }: { vehicles: Vehicle[] }) => (
   <Container>
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
       {vehicles.map((vehicle) => (

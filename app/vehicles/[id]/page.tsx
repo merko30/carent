@@ -52,7 +52,7 @@ const VehiclePage = async ({
             <h1 className="text-4xl font-semibold">
               {vehicle?.brand.name} {vehicle?.model}
             </h1>
-            <EditLink ownerId={vehicle.ownerId} />
+            <EditLink vehicle={vehicle} />
           </div>
           <Features vehicle={vehicle} />
           <div className="flex gap-6 items-center py-8 border-y border-gray-300">

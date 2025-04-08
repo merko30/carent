@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["placehold.co"],
   },
+  experimental: {
+    authInterrupts: true,
+  },
 };
 
 export default nextConfig;

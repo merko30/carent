@@ -3,9 +3,11 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
-const EditLink = ({ ownerId }: { ownerId: string }) => {
+import { Vehicle } from "@/types";
+
+const EditLink = ({ vehicle }: { vehicle: Vehicle }) => {
   const { data: session } = useSession();
-  const isOwner = session?.user?.id === ownerId;
+  const isOwner = session?.user?.id === vehicle.ownerId;
 
   if (!session || !isOwner) {
     return null;
@@ -13,7 +15,7 @@ const EditLink = ({ ownerId }: { ownerId: string }) => {
 
   return (
     <Link
-      href={`/vehicles/${ownerId}/edit`}
+      href={`/vehicles/${vehicle.id}/edit`}
       className="bg-orange-500 text-white px-4 py-2 rounded-lg"
     >
       Uredi

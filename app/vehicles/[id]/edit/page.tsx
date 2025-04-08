@@ -1,5 +1,5 @@
 import { Brand } from "@prisma/client";
-import { notFound, redirect } from "next/navigation";
+import { notFound, unauthorized } from "next/navigation";
 import { getServerSession } from "next-auth";
 
 import { VehicleWithRating } from "@/types";
@@ -18,19 +18,37 @@ const loadVehicle = async (
 }> => {
   const session = await getServerSession(authOptions);
 
-  const [vehicleResponse, brandsResponse] = await Promise.all([
-    fetch(`${process.env.SITE_URL}/api/vehicles/${id}`),
-    fetch(`${process.env.SITE_URL}/api/brands`),
-  ]);
+  const vehicleResponse = await fetch(
+    `${process.env.SITE_URL}/api/vehicles/${id}`
+  );
 
-  const brandsData = await brandsResponse.json();
   const data = await vehicleResponse.json();
 
-  if (!data || session?.user.id !== data.ownerId) {
+  if (!data) {
     return notFound();
   }
 
-  return { ...data, brands: brandsData.brands ?? [] };
+  if (data && data.ownerId && data.ownerId !== session?.user.id) {
+    console.log("Unauthorized access attempt:", {
+      userId: session?.user.id,
+      vehicleOwnerId: data.ownerId,
+    });
+
+    return unauthorized();
+  }
+
+  return data;
+};
+
+const loadBrands = async (): Promise<Brand[]> => {
+  const brandsResponse = await fetch(`${process.env.SITE_URL}/api/brands`);
+  const brandsData = await brandsResponse.json();
+
+  if (!brandsData) {
+    return notFound();
+  }
+
+  return brandsData?.brands ?? [];
 };
 
 const EditVehiclePage = async ({
@@ -41,11 +59,8 @@ const EditVehiclePage = async ({
   };
 }) => {
   const { id } = await params;
-  const { vehicle, brands } = await loadVehicle(id);
-
-  if (!vehicle) {
-    return redirect("/404");
-  }
+  const { vehicle } = await loadVehicle(id);
+  const brands = await loadBrands();
 
   return (
     <Container className="flex flex-col items-center">
