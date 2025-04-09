@@ -49,3 +49,10 @@ export type RentingVehiclesWithVehicle = RentingVehicles & {
     model: string;
   };
 };
+
+export type Location = {
+  city: string;
+  address: string;
+  zip: string;
+  phone: string;
+};

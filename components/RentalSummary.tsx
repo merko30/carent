@@ -5,11 +5,13 @@ import { DayPicker, DateRange } from "react-day-picker";
 import { useSession } from "next-auth/react";
 import "react-day-picker/style.css";
 
-import { Vehicle } from "@/types";
-import LocationSelect from "./LocationPicker";
+import { Location, Vehicle } from "@/types";
+
+import LocationSelect from "./LocationSelect";
 
 const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
   const { data: session } = useSession();
+  const [pickupLocation, setPickupLocation] = useState<Location>();
   const [range, setRange] = useState<DateRange>({
     from: new Date(),
     to: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -38,7 +40,10 @@ const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
       <h2 className="text-lg font-semibold mb-4">
         Odaberi lokaciju preuzimanja
       </h2>
-      <LocationSelect onSave={console.log} />
+      <LocationSelect
+        location={pickupLocation}
+        onSave={(location) => setPickupLocation(location as Location)}
+      />
       <hr className="text-gray-300 my-5" />
       <h2 className="text-lg font-semibold mb-4">Odaberi datum preuzimanja</h2>
 

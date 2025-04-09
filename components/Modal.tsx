@@ -42,7 +42,7 @@ const Modal = ({
       }}
     >
       <div
-        className="bg-white p-4 rounded-lg shadow-lg"
+        className="w-full md:w-2/3 lg:w-1/2 bg-white p-4 rounded-lg shadow-lg"
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
       >
