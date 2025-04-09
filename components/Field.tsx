@@ -28,6 +28,7 @@ export default function Field({
   (
     | InputHTMLAttributes<HTMLInputElement>
     | TextareaHTMLAttributes<HTMLTextAreaElement>
+    | SelectHTMLAttributes<HTMLSelectElement>
   )) {
   const isCheckbox = type === "checkbox";
 

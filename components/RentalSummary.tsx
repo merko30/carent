@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { DayPicker, DateRange } from "react-day-picker";
+import { useSession } from "next-auth/react";
 import "react-day-picker/style.css";
 
 import { Vehicle } from "@/types";
+import LocationSelect from "./LocationPicker";
 
 const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
+  const { data: session } = useSession();
   const [range, setRange] = useState<DateRange>({
     from: new Date(),
     to: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -20,6 +23,11 @@ const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
     return vehicle.price * days;
   }, [range, vehicle.price]);
 
+  // TODO: SHOW STATS FOR THE VEHICLE or price update component
+  if (session && session.user.id === vehicle.ownerId) {
+    return null;
+  }
+
   return (
     <div className="p-4">
       <h2 className="text-2xl font-semibold leading-snug">
@@ -27,6 +35,13 @@ const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
       </h2>
       <p className="text-gray-400 text-sm mb-4">{vehicle.price} KM po danu</p>
       <hr className="text-gray-300 my-5" />
+      <h2 className="text-lg font-semibold mb-4">
+        Odaberi lokaciju preuzimanja
+      </h2>
+      <LocationSelect onSave={console.log} />
+      <hr className="text-gray-300 my-5" />
+      <h2 className="text-lg font-semibold mb-4">Odaberi datum preuzimanja</h2>
+
       <DayPicker
         mode="range"
         required={true}
