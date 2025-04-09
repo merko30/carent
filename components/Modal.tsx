@@ -34,7 +34,7 @@ const Modal = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-black/30 flex justify-center items-center z-50"
+      className="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
       onClick={() => {
         if (closeOnOutsideClick) {
           onClose();
