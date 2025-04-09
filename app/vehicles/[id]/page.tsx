@@ -26,7 +26,8 @@ const VehiclePage = async ({
     id: string;
   };
 }) => {
-  const { vehicle } = await loadVehicle(params.id);
+  const { id } = await params;
+  const { vehicle } = await loadVehicle(id);
 
   if (!vehicle) {
     return null;
@@ -43,11 +44,12 @@ const VehiclePage = async ({
             alt={`${vehicle.brand.name}-${vehicle.model}`}
             className="object-cover rounded-lg mb-4"
             fill
+            priority
           />
         </div>
       </div>
-      <div className="flex gap-4">
-        <div className="w-2/3">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full lg:w-2/3">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-semibold">
               {vehicle?.brand.name} {vehicle?.model}
@@ -65,7 +67,7 @@ const VehiclePage = async ({
             </div>
           )}
         </div>
-        <div className="w-1/3">
+        <div className="w-full lg:w-1/3">
           <RentalSummary vehicle={vehicle} />
         </div>
       </div>
