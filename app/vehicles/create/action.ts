@@ -32,6 +32,7 @@ const createVehicleFn = async (
   formData: FormData
 ): Promise<State> => {
   "use server";
+
   const rawFormData = {
     brandId: formData.get("brandId")?.toString(),
     model: formData.get("model")?.toString(),
@@ -45,9 +46,6 @@ const createVehicleFn = async (
     description: formData.get("description")?.toString(),
     images: formData.getAll("images"),
     features: {},
-    // description: formData.get("description"),
-    // ownerId: formData.get("ownerId"),
-    // images: formData.getAll("images"),
   };
 
   const schema = z.object({
@@ -55,23 +53,6 @@ const createVehicleFn = async (
     model: z.string().nonempty("Molimo odaberite model vozila"),
     year: z.string().nonempty("Molimo odaberite godište vozila"),
     price: z.string().nonempty("Molimo odaberite cijenu vozila"),
-    type: z.string().nonempty("Molimo odaberite tip vozila"),
-    typeOfFuel: z.string().nonempty("Molimo odaberite vrstu goriva"),
-    color: z.string().nonempty("Molimo odaberite boju vozila"),
-    // image files
-    images: z.any().refine((files) => {
-      if (files.length === 0) {
-        return false;
-      }
-      for (const file of files) {
-        if (!(file instanceof File)) {
-          return false;
-        }
-      }
-      return true;
-    }, "Molimo odaberite slike vozila"),
-    // numberOfDoors: z.string().nonempty("Morate uneti broj vrata"),
-    // numberOfSeats: z.string().nonempty("Morate uneti broj sedišta"),
   });
 
   const validation = schema.safeParse(rawFormData);
@@ -96,15 +77,22 @@ const createVehicleFn = async (
   const body = {
     brandId: parseInt(rawFormData.brandId!),
     model: rawFormData.model as string,
-    description: rawFormData.description as string,
     year: parseInt(rawFormData.year!),
     price: parseInt(rawFormData.price!),
-    type: rawFormData.type as CarType,
+    // optional values
+    description: rawFormData.description as string,
+    type: rawFormData.type ? (rawFormData.type as CarType) : null,
     color: rawFormData.color as string,
-    typeOfFuel: rawFormData.typeOfFuel as Fuel,
-    numberOfDoors: parseInt(rawFormData.numberOfDoors!),
-    numberOfSeats: parseInt(rawFormData.numberOfSeats!),
-    features: rawFormData.features,
+    typeOfFuel: rawFormData.typeOfFuel
+      ? (rawFormData.typeOfFuel as Fuel)
+      : null,
+    numberOfDoors: rawFormData.numberOfDoors
+      ? parseInt(rawFormData.numberOfDoors)
+      : null,
+    numberOfSeats: rawFormData.numberOfSeats
+      ? parseInt(rawFormData.numberOfSeats)
+      : null,
+    features: rawFormData.features ?? {},
   };
 
   try {
