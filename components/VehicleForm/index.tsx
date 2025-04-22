@@ -6,9 +6,10 @@ import toast from "react-hot-toast";
 
 import { Brand } from "@/types";
 
+import { COLORS } from "@/constants/colors";
+
 import Field from "@/components/Field";
 import SubmitButton from "@/components/SubmitButton";
-import { COLORS } from "@/constants/colors";
 import Alert from "@/components/Alert";
 
 import { State } from "./type";
@@ -98,6 +99,18 @@ const Form = ({
                 </option>
               ))}
             </Field>
+          </div>
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700">
+              Slike
+            </label>
+            <input
+              type="file"
+              multiple
+              name="images"
+              className="block w-full p-2 border border-gray-300 rounded-md"
+              accept="image/*"
+            />
           </div>
           <Field
             type="textarea"

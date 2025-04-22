@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createS3Client, uploadImageToS3 } from "@/lib/s3";
 import { CarType, Fuel, Vehicle } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -42,6 +43,7 @@ const createVehicleFn = async (
     numberOfDoors: formData.get("numberOfDoors")?.toString(),
     numberOfSeats: formData.get("numberOfSeats")?.toString(),
     description: formData.get("description")?.toString(),
+    images: formData.getAll("images"),
     features: {},
     // description: formData.get("description"),
     // ownerId: formData.get("ownerId"),
@@ -55,6 +57,19 @@ const createVehicleFn = async (
     price: z.string().nonempty("Molimo odaberite cijenu vozila"),
     type: z.string().nonempty("Molimo odaberite tip vozila"),
     typeOfFuel: z.string().nonempty("Molimo odaberite vrstu goriva"),
+    color: z.string().nonempty("Molimo odaberite boju vozila"),
+    // image files
+    images: z.any().refine((files) => {
+      if (files.length === 0) {
+        return false;
+      }
+      for (const file of files) {
+        if (!(file instanceof File)) {
+          return false;
+        }
+      }
+      return true;
+    }, "Molimo odaberite slike vozila"),
     // numberOfDoors: z.string().nonempty("Morate uneti broj vrata"),
     // numberOfSeats: z.string().nonempty("Morate uneti broj sedišta"),
   });
@@ -95,9 +110,32 @@ const createVehicleFn = async (
   try {
     const session = await getServerSession(authOptions);
 
+    let imageUrls: string[] = [];
+
+    if (rawFormData.images.length) {
+      const S3Client = createS3Client();
+
+      imageUrls = await Promise.all(
+        rawFormData.images.map((file: FormDataEntryValue) =>
+          uploadImageToS3(
+            S3Client,
+            file as File,
+            `vehicles/${session?.user.id}`
+          )
+        )
+      );
+    }
+
     const vehicle = await prisma.vehicle.create({
       data: {
         ...body,
+        images: {
+          create: imageUrls.map((url, i) => ({
+            url,
+            sort: i,
+            isPrimary: i === 0,
+          })),
+        },
         ownerId: session?.user.id as string,
       },
     });

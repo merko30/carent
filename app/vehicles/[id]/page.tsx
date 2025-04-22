@@ -38,9 +38,7 @@ const VehiclePage = async ({
       <div className="w-full border-2 border-gray-100 mb-4">
         <div className="relative h-96">
           <Image
-            src={
-              vehicle.images?.[0]?.url ?? "https://placehold.co/1024x400.png"
-            }
+            src={`/api/image/${vehicle.images[0].url}`}
             alt={`${vehicle.brand.name}-${vehicle.model}`}
             className="object-cover rounded-lg mb-4"
             fill
