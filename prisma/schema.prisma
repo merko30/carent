@@ -127,19 +127,24 @@ model Review {
   updatedAt DateTime @updatedAt
 }
 
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
 model Vehicle {
   id        Int      @id @default(autoincrement())
   brand     Brand   @relation(fields: [brandId], references: [id])
   brandId   Int
   model     String
   year      Int
-  color     String
+  color     String?
   numberOfDoors Int?
   numberOfSeats Int?
   description String?
   images    VehicleImage[]
   type CarType @default(SEDAN)
-  typeOfFuel Fuel
+  typeOfFuel Fuel? @default(GASOLINE)
+  transmission Transmission? @default(MANUAL)
   features Json?
   price     Float
   createdAt DateTime @default(now())
