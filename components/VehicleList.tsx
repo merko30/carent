@@ -15,9 +15,7 @@ const VehicleList = ({ vehicles = [] }: { vehicles: Vehicle[] }) => (
         >
           <div className="w-full h-48 relative mb-2">
             <Image
-              src={
-                vehicle.images?.[0]?.url ?? "https://placehold.co/200x200.png"
-              }
+              src={`/api/image/${vehicle.images[0]?.url}`}
               alt={`${vehicle.brand.name}-${vehicle.model}`}
               className="object-cover rounded-md"
               fill

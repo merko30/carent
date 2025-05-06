@@ -35,19 +35,18 @@ const VehiclePage = async ({
 
   return (
     <Container>
-      <div className="w-full border-2 border-gray-100 mb-4">
-        <div className="relative h-96">
-          <Image
-            src={`/api/image/${vehicle.images[0].url}`}
-            alt={`${vehicle.brand.name}-${vehicle.model}`}
-            className="object-cover rounded-lg mb-4"
-            fill
-            priority
-          />
-        </div>
-      </div>
+      <div className="w-full border-2 border-gray-100 mb-4"></div>
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-2/3">
+          <div className="w-full h-96 relative mb-4">
+            <Image
+              src={`/api/image/${vehicle.images[0].url}`}
+              alt={`${vehicle.brand.name}-${vehicle.model}`}
+              className="object-cover rounded-lg mb-4"
+              fill
+              priority
+            />
+          </div>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-semibold">
               {vehicle?.brand.name} {vehicle?.model}
