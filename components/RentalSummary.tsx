@@ -1,17 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DayPicker, DateRange } from "react-day-picker";
 import { useSession } from "next-auth/react";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import "react-day-picker/style.css";
 
 import { Location, Vehicle } from "@/types";
 
 import LocationSelect from "./LocationSelect";
 
+const convertBAMToEUR = (amount: number) => {
+  const conversionRate = 0.51; // Example conversion rate
+  return amount * conversionRate;
+};
+
 const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
   const { data: session } = useSession();
   const [pickupLocation, setPickupLocation] = useState<Location>();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [range, setRange] = useState<DateRange>({
     from: new Date(),
     to: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -24,6 +32,37 @@ const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
     );
     return vehicle.price * days;
   }, [range, vehicle.price]);
+
+  const createOrder = useCallback(
+    async (data: any, actions: any) => {
+      setIsProcessing(true);
+      const order = await actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "EUR",
+              value: convertBAMToEUR(price).toFixed(2).toString(),
+            },
+          },
+        ],
+      });
+      return order;
+    },
+    [price]
+  );
+
+  const onApprove = async (data: any, actions: any) => {
+    setIsProcessing(true);
+    const order = await actions.order.capture();
+    console.log("Order captured:", order);
+    setIsProcessing(false);
+  };
+
+  const onError = (error: any) => {
+    console.error("PayPal error:", error);
+    setError("An error occurred while processing your payment.");
+    setIsProcessing(false);
+  };
 
   // TODO: SHOW STATS FOR THE VEHICLE or price update component
   if (session && session.user.id === vehicle.ownerId) {
@@ -56,6 +95,22 @@ const RentalSummary = ({ vehicle }: { vehicle: Vehicle }) => {
           before: new Date(),
         }}
       />
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      <PayPalScriptProvider
+        options={{
+          clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+          currency: "EUR",
+          intent: "capture",
+        }}
+      >
+        <PayPalButtons
+          createOrder={createOrder}
+          onApprove={onApprove}
+          onError={onError}
+          style={{ layout: "vertical" }}
+          disabled={isProcessing}
+        />
+      </PayPalScriptProvider>
     </div>
   );
 };
